@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 /// <summary>
@@ -12,22 +9,22 @@ public class NouseMovement : MonoBehaviour
     //__________________________________________________________________________ Variables
     [SerializeField] private float mouseSensitivity = 400f;
 
-    float xMouseSensitivity;
-    float yMouseSensitivity;
+    private float xMouseSensitivity;
+    private float yMouseSensitivity;
 
-    float xMouseRotation;
-    float yMouseRotation;
+    private float xMouseRotation;
+    private float yMouseRotation;
 
-    Transform playerOrientation;
+    private Transform playerOrientation;
 
     //__________________________________________________________________________ Run
-    void Start()
+    private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         playerOrientation = GameObject.Find("PlayerOrientation").transform;
     }
 
-    void Update()
+    private void Update()
     {
         MoveCamera();
     }
