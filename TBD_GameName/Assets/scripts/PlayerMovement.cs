@@ -28,10 +28,10 @@ public class PlayerMovement : MonoBehaviour
 
     //on ground chack
     [SerializeField] private float playerHeight;
-    public LayerMask groundLayer;
+    [SerializeField] private LayerMask groundLayer;
     [SerializeField] private bool onGround;
 
-    public Transform playerOrientation;
+    [SerializeField] private Transform playerOrientation;
 
     private Vector3 moveDirection;
 
@@ -53,6 +53,12 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         //ground chack, by shooting raycast down that finds a layer of ground
+
+        ///<summary>
+        /// change the ground check method!!!!!!!!!!!!!!!!!!!!!
+        /// </summary>
+
+
         onGround = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundLayer);
 
         //adding drag on ground with Rigidbody
