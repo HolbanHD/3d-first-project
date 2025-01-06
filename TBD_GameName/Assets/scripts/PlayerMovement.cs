@@ -11,189 +11,136 @@ public class PlayerMovement : MonoBehaviour
 {
 
     //__________________________________________________________________________ Variables
-    Rigidbody rb;
+    private Rigidbody rb;
 
     //movement
-    [SerializeField] float moveSpeed;
-    [SerializeField] float groundDrag;
+    [SerializeField] private float currentSpeed;
+    [SerializeField] private float defaultSpeed;
+    [SerializeField] private float sprintSpeed;
+    [SerializeField] private float inAirMoveSpeed;
+    [SerializeField] private float groundDrag;
+    [SerializeField] private float playerGravity;
 
     //jump
-    [SerializeField] float jumpForce;
-    [SerializeField] float jumpCooldown;
-    [SerializeField] float airMultiplier;
-    bool readyToJump;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float jumpCooldown;
+    private bool canJump;
 
-    //[SerializeField] float walkSpeed;
-    //[SerializeField] float sprintSpeed;
-
-    //public KeyCode jumpKey = KeyCode.Space;
-
-    [SerializeField] float playerHeight;
-    public LayerMask whatIsGround;
-    [SerializeField] bool grounded;
+    //on ground chack
+    [SerializeField] private float playerHeight;
+    public LayerMask groundLayer;
+    [SerializeField] private bool onGround;
 
     public Transform playerOrientation;
 
-    float horizontalInput;
-    float verticalInput;
+    private Vector3 moveDirection;
 
-    Vector3 moveDirection;
+    private float horizontalInput;
+    private float verticalInput;
 
 
     //__________________________________________________________________________ Run
     private void Start()
     {
-        playerOrientation = GameObject.Find("PlayerOrientation").transform;
+        playerOrientation = transform.GetChild(0);
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
-        readyToJump = true;
+        canJump = true;
+        currentSpeed = defaultSpeed;
     }
 
     private void Update()
     {
-        // ground check
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
-        
-        PlayerInput();
-        SpeedControl();
+        //ground chack, by shooting raycast down that finds a layer of ground
+        onGround = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundLayer);
 
-        // handle drag
-        if (grounded)
+        //adding drag on ground with Rigidbody
+        if (onGround)
             rb.drag = groundDrag;
         else
             rb.drag = 0;
+
+        PlayerInput();
     }
 
     private void FixedUpdate()
     {
         MovePlayer();
+        Jump();
+        SpeedControl();
     }
 
 
     //__________________________________________________________________________ Mathods
+    //gets input and sets different speeds 
     private void PlayerInput()
     {
+        //gets directions based on input
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
-        // when to jump
-        if (Input.GetButton("Jump") && readyToJump && grounded)
+        //sprint mechanic
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canJump && onGround)
         {
-            readyToJump = false;
+            currentSpeed = sprintSpeed;
+        }
 
-            Jump();
+        //Checks if the player is on the floor to reset the speed, for not to damage his inertia in the air after a jump while sprint jump.
+        if (Input.GetKey(KeyCode.LeftShift) == false && onGround)
+        {
+            currentSpeed = defaultSpeed;
+        }
+    }
 
+    //calculate and adding force to the diraction by inputs and ground chacking
+    private void MovePlayer()
+    {
+        //calculate movement direction
+        moveDirection = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
+
+        //adding force for movement on ground
+        if (onGround)
+        {
+            rb.AddForce(moveDirection.normalized * currentSpeed * 10f, ForceMode.Force); 
+        }
+
+        //adding force for movement in air and gravity simulation
+        else
+        {
+            rb.AddForce(moveDirection.normalized * inAirMoveSpeed * 10f * currentSpeed, ForceMode.Force);
+            rb.AddForce(Vector3.down.normalized * playerGravity * 10f, ForceMode.Force); 
+        }
+
+    }
+
+    //adds impulse force up, for jumping
+    private void Jump()
+    {
+        //if (Input.GetKey(KeyCode.Space) && canJump && onGround)
+        if(Input.GetButton("Jump") && canJump && onGround)
+        {
+            canJump = false;
+            rb.AddForce(transform.up * jumpForce + moveDirection * currentSpeed, ForceMode.Impulse);
             Invoke(nameof(ResetJump), jumpCooldown);
         }
     }
 
-    private void MovePlayer()
-    {
-        // calculate movement direction
-        moveDirection = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
-
-        // on ground
-        if (grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-
-        // in air
-        else if (!grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
-    }
-
+    //calculate and limit the player speed
     private void SpeedControl()
     {
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        // limit velocity if needed
-        if (flatVel.magnitude > moveSpeed)
+        if (flatVel.magnitude > currentSpeed)
         {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            Vector3 limitedVel = flatVel.normalized * currentSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
     }
 
-    private void Jump()
-    {
-        // reset y velocity
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-    }
-
     private void ResetJump()
     {
-        readyToJump = true;
+        canJump = true;
     }
 
 }
-
-    /*//__________________________________________________________________________ Variables
-    [SerializeField] CharacterController Controller;
-
-    [SerializeField] float playerSpeed = 12f;
-    [SerializeField] float playerGravity = -9.81f * 2;
-    [SerializeField] float playerJumpHeight = 3f;
-    [SerializeField] float moveDirX;
-    [SerializeField] float moveDirZ;
-    [SerializeField] Vector3 velocity;
-
-    [SerializeField] Transform playerBoots;
-    [SerializeField] float groundDistance = 0.4f;
-    [SerializeField] LayerMask groundMask;
-    [SerializeField] bool onGround;
-
-    //__________________________________________________________________________ Run
-    void Start()
-    {
-        //Controller = GetComponent<CharacterController>();
-        Controller = GameObject.Find("Player").GetComponent<CharacterController>();
-    }
-
-    private void FixedUpdate()
-    {
-        MovePlayer();
-        JumpPlayer();
-    }
-
-    private void Update()
-    {
-        IsPlayerOnGroundChack();
-    }
-
-    //__________________________________________________________________________ Mathods
-
-    private void IsPlayerOnGroundChack()
-    {
-        onGround = Physics.CheckSphere(playerBoots.position, groundDistance, groundMask);
-
-
-        if (onGround && velocity.y < 0)
-        {
-            velocity.y = -2f;
-        }
-    }
-
-    private void MovePlayer()
-    {
-
-        moveDirX = Input.GetAxis("Horizontal");
-        moveDirZ = Input.GetAxis("Vertical");
-
-        Vector3 move = transform.right * moveDirX + transform.forward * moveDirZ;
-
-        Controller.Move(move * playerSpeed * Time.deltaTime);
-
-    }
-
-    private void JumpPlayer()
-    {
-
-        if (Input.GetButton("Jump") && onGround == true)
-        {
-            velocity.y = Mathf.Sqrt(playerJumpHeight * -2f * playerGravity);
-        }
-        velocity.y += playerGravity * Time.deltaTime;
-        Controller.Move(velocity * Time.deltaTime);
-    }*/
