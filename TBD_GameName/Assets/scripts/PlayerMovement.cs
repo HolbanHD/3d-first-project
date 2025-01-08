@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpCooldown;
     private bool canJump;
 
-    //on ground chack
+    //on ground check
     [SerializeField] private float playerHeight;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private bool onGround;
@@ -78,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    //__________________________________________________________________________ Mathods
+    //__________________________________________________________________________ Methods
     //gets input and sets different speeds 
     private void PlayerInput()
     {
@@ -99,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    //calculate and adding force to the diraction by inputs and ground chacking
+    //calculate and adding force to the direction by inputs and ground checking
     private void MovePlayer()
     {
         //calculate movement direction
