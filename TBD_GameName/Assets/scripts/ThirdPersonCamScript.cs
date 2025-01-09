@@ -14,15 +14,13 @@ public class ThirdPersonCamScript : MonoBehaviour
     Transform player;
     Transform playerObj;
     Transform playerOrientation;
-    Transform shootingPoint;
-    Transform aimAngel;
     [SerializeField] GameObject mainCam;
     [SerializeField] GameObject aimCam;
-    CinemachineBrain cineBrain;
-    //GameObject aimCamScript;
-    MouseMovement mouseMovement;
 
-    //[SerializeField] float rotationSpeed;
+    [SerializeField] private float mouseSensitivity = 400f;
+
+    //Quaternion cameraRotation;
+    //Quaternion playerRotation;
 
     //__________________________________________________________________________ Run
     void Start()
@@ -30,30 +28,25 @@ public class ThirdPersonCamScript : MonoBehaviour
         Init();
     }
 
-
     void Update()
     {
 
-            SincCamDirToPlayerMovement();
+
         if (Input.GetKey(KeyCode.Mouse1) == true)
         {
-            //cineBrain.enabled = false;
-           //player.transform.rotation = playerRotation;
-           //mainCam.enabled = false;
             mainCam.SetActive(false);
             aimCam.SetActive(true);
-            //aimCam.enabled = true;
-            //transform.position = aimAngel.position;
-            //MoveCamera();
+            //aimCam.transform.rotation = cameraRotation;
+            //playerOrientation.rotation = playerRotation;
+            AimCameraSync();
         }
 
         else
         {
             mainCam.SetActive(true);
             aimCam.SetActive(false);
-            //mainCam.enabled =true;
-            //aimCam.enabled = false;
-            //cineBrain.enabled = true;
+            SyncCamDirToPlayerMovement();
+
         }
     }
 
@@ -63,51 +56,40 @@ public class ThirdPersonCamScript : MonoBehaviour
         player = GameObject.Find("Player").transform;
         playerObj = GameObject.Find("Player_OBJ").transform;
         playerOrientation = GameObject.Find("PlayerOrientation").transform;
-        shootingPoint = GameObject.Find("ShootingPoint").transform;
-        aimAngel = GameObject.Find("playerCameraPos").transform;
-        mouseMovement = gameObject.GetComponent<MouseMovement>();
-        cineBrain = gameObject.GetComponent<CinemachineBrain>();
-        //mainCam = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
-        
+
     }
 
     Vector3 viewDiraction;
-    Quaternion viewRotation;
     Vector3 inputDir;
-    Ray ray;
 
-    private void SincCamDirToPlayerMovement()
+    private void SyncCamDirToPlayerMovement()
     {
-        //player.rotation = transform.rotation;
-        //playerRotation = transform.rotation;
-
-        viewDiraction = player.position - new Vector3(transform.position.x , player.position.y , transform.position.z);
+        viewDiraction = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
         playerOrientation.forward = viewDiraction.normalized;
 
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         float verticalInput = Input.GetAxisRaw("Vertical");
 
-        inputDir = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput ;
+        inputDir = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
 
         if (inputDir != Vector3.zero)
         {
-            //playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, rotationSpeed);
             playerObj.forward = Vector3.Slerp(playerObj.forward, inputDir.normalized, mouseSensitivity);
         }
+
+        //cameraRotation = mainCam.transform.rotation;
+        //playerRotation = playerOrientation.rotation;
+
     }
 
-    [SerializeField] private float mouseSensitivity = 400f;
 
-/*    private float xMouseSensitivity;
-    private float yMouseSensitivity;
+    float xMouseSensitivity;
+    float yMouseSensitivity;
+    float xMouseRotation;
+    float yMouseRotation;
 
-    private float xMouseRotation;
-    private float yMouseRotation;
-
-    Quaternion playerRotation;
-
-    public void MoveCamera()
+    public void AimCameraSync()
     {
 
         xMouseSensitivity = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
@@ -119,8 +101,10 @@ public class ThirdPersonCamScript : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(xMouseRotation, yMouseRotation, 0);
         playerOrientation.rotation = Quaternion.Euler(0, yMouseRotation, 0);
-        playerObj.rotation = Quaternion.Euler(0, yMouseRotation, 0);
+        //playerObj.rotation = Quaternion.Euler(0, yMouseRotation, 0);
 
-    }*/
+        //cameraRotation = aimCam.transform.rotation;
+        //playerRotation = playerOrientation.rotation;
+    }
 
 }

@@ -4,8 +4,7 @@ using Unity.VisualScripting;
 using TMPro;
 using UnityEngine;
 
-//public abstract class Weapon : MonoBehaviour, IShootable
-public class Weapon : MonoBehaviour, IShootable
+public abstract class Weapon : MonoBehaviour, IShootable
 {
     //__________________________________________________________________________ Variables
 
@@ -52,7 +51,7 @@ public class Weapon : MonoBehaviour, IShootable
 
     //__________________________________________________________________________ Methods
 
-    private void GunInput()
+    protected void GunInput()
     {
         if (fireModeAuto) shooting = Input.GetKey(KeyCode.Mouse0);
         else shooting = Input.GetKeyDown(KeyCode.Mouse0);
@@ -78,7 +77,7 @@ public class Weapon : MonoBehaviour, IShootable
         Invoke(nameof(ReloadingDone), reloadTime);
     }
 
-    private void ReloadingDone()
+    protected void ReloadingDone()
     {
         currentAmmo = magSize;
         reloading = false;
@@ -123,7 +122,7 @@ public class Weapon : MonoBehaviour, IShootable
         }*/
     }
 
-    private void ResetShoot()
+    protected void ResetShoot()
     {
         readyToShoot = true;
         allowInvoke = true;
