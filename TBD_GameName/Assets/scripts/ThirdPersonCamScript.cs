@@ -1,4 +1,5 @@
 using Cinemachine;
+using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -15,7 +16,8 @@ public class ThirdPersonCamScript : MonoBehaviour
     Transform playerOrientation;
     Transform shootingPoint;
     Transform aimAngel;
-    Camera cam;
+    [SerializeField] GameObject mainCam;
+    [SerializeField] GameObject aimCam;
     CinemachineBrain cineBrain;
     //GameObject aimCamScript;
     MouseMovement mouseMovement;
@@ -32,17 +34,26 @@ public class ThirdPersonCamScript : MonoBehaviour
     void Update()
     {
 
+            SincCamDirToPlayerMovement();
         if (Input.GetKey(KeyCode.Mouse1) == true)
         {
-            cineBrain.enabled = false;
-            transform.position = aimAngel.position;
-            MoveCamera();
+            //cineBrain.enabled = false;
+           //player.transform.rotation = playerRotation;
+           //mainCam.enabled = false;
+            mainCam.SetActive(false);
+            aimCam.SetActive(true);
+            //aimCam.enabled = true;
+            //transform.position = aimAngel.position;
+            //MoveCamera();
         }
 
         else
         {
-            cineBrain.enabled = true;
-            SincCamDirToPlayerMovement();
+            mainCam.SetActive(true);
+            aimCam.SetActive(false);
+            //mainCam.enabled =true;
+            //aimCam.enabled = false;
+            //cineBrain.enabled = true;
         }
     }
 
@@ -56,7 +67,7 @@ public class ThirdPersonCamScript : MonoBehaviour
         aimAngel = GameObject.Find("playerCameraPos").transform;
         mouseMovement = gameObject.GetComponent<MouseMovement>();
         cineBrain = gameObject.GetComponent<CinemachineBrain>();
-        cam = Camera.main;
+        //mainCam = Camera.main;
         Cursor.lockState = CursorLockMode.Locked;
         
     }
@@ -68,8 +79,8 @@ public class ThirdPersonCamScript : MonoBehaviour
 
     private void SincCamDirToPlayerMovement()
     {
-
-
+        //player.rotation = transform.rotation;
+        //playerRotation = transform.rotation;
 
         viewDiraction = player.position - new Vector3(transform.position.x , player.position.y , transform.position.z);
         playerOrientation.forward = viewDiraction.normalized;
@@ -88,14 +99,17 @@ public class ThirdPersonCamScript : MonoBehaviour
 
     [SerializeField] private float mouseSensitivity = 400f;
 
-    private float xMouseSensitivity;
+/*    private float xMouseSensitivity;
     private float yMouseSensitivity;
 
     private float xMouseRotation;
     private float yMouseRotation;
 
+    Quaternion playerRotation;
+
     public void MoveCamera()
     {
+
         xMouseSensitivity = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         yMouseSensitivity = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
         xMouseRotation -= yMouseSensitivity;
@@ -107,6 +121,6 @@ public class ThirdPersonCamScript : MonoBehaviour
         playerOrientation.rotation = Quaternion.Euler(0, yMouseRotation, 0);
         playerObj.rotation = Quaternion.Euler(0, yMouseRotation, 0);
 
-    }
+    }*/
 
 }
