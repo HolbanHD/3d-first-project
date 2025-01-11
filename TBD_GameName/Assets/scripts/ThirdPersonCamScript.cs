@@ -31,14 +31,14 @@ public class ThirdPersonCamScript : MonoBehaviour
     void Update()
     {
 
+            AimCameraSync();
 
-        if (Input.GetKey(KeyCode.Mouse1) == true)
+/*        if (Input.GetKey(KeyCode.Mouse1) == true)
         {
             mainCam.SetActive(false);
             aimCam.SetActive(true);
             //aimCam.transform.rotation = cameraRotation;
             //playerOrientation.rotation = playerRotation;
-            AimCameraSync();
         }
 
         else
@@ -47,7 +47,7 @@ public class ThirdPersonCamScript : MonoBehaviour
             aimCam.SetActive(false);
             SyncCamDirToPlayerMovement();
 
-        }
+        }*/
     }
 
     //__________________________________________________________________________ Mathods
