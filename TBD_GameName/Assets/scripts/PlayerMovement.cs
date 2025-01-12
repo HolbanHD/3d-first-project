@@ -31,22 +31,18 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private bool onGround;
 
+    [SerializeField] private Transform playerOrientation;
 
-    [SerializeField] private Transform player;
-    //[SerializeField] private Transform playerOrientation;
+    private Vector3 moveDirection;
 
-    //private Vector3 moveDirection;
+    private float horizontalInput;
+    private float verticalInput;
 
-    //private float horizontalInput;
-    //private float verticalInput;
-
-    [SerializeField] private Transform cameraTransform;
-    [SerializeField] private float rotationSpeed;
 
     //__________________________________________________________________________ Run
     private void Start()
     {
-        //playerOrientation = transform.GetChild(0);
+        playerOrientation = transform.GetChild(0);
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
@@ -71,7 +67,6 @@ public class PlayerMovement : MonoBehaviour
         else
             rb.drag = 0;
 
-
         PlayerInput();
     }
 
@@ -88,10 +83,8 @@ public class PlayerMovement : MonoBehaviour
     private void PlayerInput()
     {
         //gets directions based on input
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
-
-
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
 
         //sprint mechanic
         if (Input.GetKeyDown(KeyCode.LeftShift) && canJump && onGround)
@@ -110,40 +103,19 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayer()
     {
         //calculate movement direction
-        //moveDirection = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
-
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        float verticalInput = Input.GetAxisRaw("Vertical");
-
-        Vector3 moveDirection = new Vector3(horizontalInput,0, verticalInput);
-        float inputMagnitude = Mathf.Clamp01(moveDirection.magnitude);
-
-        moveDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * moveDirection;
-        moveDirection.Normalize();
-
-        
-            rb.MoveRotation(Quaternion.LookRotation(moveDirection));
-        
-
-
-        Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-
-        player.transform.rotation = Quaternion.RotateTowards(player.transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
-
-
-
+        moveDirection = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
 
         //adding force for movement on ground
         if (onGround)
         {
-            rb.AddForce(moveDirection.normalized * currentSpeed * 10f, ForceMode.Force);
+            rb.AddForce(moveDirection.normalized * currentSpeed * 10f, ForceMode.Force); 
         }
 
         //adding force for movement in air and gravity simulation
         else
         {
             rb.AddForce(moveDirection.normalized * inAirMoveSpeed * 10f * currentSpeed, ForceMode.Force);
-            rb.AddForce(Vector3.down.normalized * playerGravity * 10f, ForceMode.Force);
+            rb.AddForce(Vector3.down.normalized * playerGravity * 10f, ForceMode.Force); 
         }
 
     }
@@ -152,10 +124,10 @@ public class PlayerMovement : MonoBehaviour
     private void Jump()
     {
         //if (Input.GetKey(KeyCode.Space) && canJump && onGround)
-        if (Input.GetButton("Jump") && canJump && onGround)
+        if(Input.GetButton("Jump") && canJump && onGround)
         {
             canJump = false;
-            //rb.AddForce(transform.up * jumpForce + moveDirection * currentSpeed, ForceMode.Impulse);
+            rb.AddForce(transform.up * jumpForce + moveDirection * currentSpeed, ForceMode.Impulse);
             Invoke(nameof(ResetJump), jumpCooldown);
         }
     }
