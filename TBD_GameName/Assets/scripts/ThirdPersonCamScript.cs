@@ -1,5 +1,6 @@
 using Cinemachine;
 using Unity.Burst.Intrinsics;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -14,13 +15,19 @@ public class ThirdPersonCamScript : MonoBehaviour
     Transform player;
     Transform playerObj;
     Transform playerOrientation;
-    [SerializeField] GameObject mainCam;
+
+    [SerializeField] GameObject currentCam;
+    [SerializeField] GameObject freeCam;
     [SerializeField] GameObject aimCam;
 
     [SerializeField] private float mouseSensitivity = 400f;
+    [SerializeField] private bool cameraSwitched = true;
 
-    //Quaternion cameraRotation;
-    //Quaternion playerRotation;
+    Quaternion cameraRotation;
+    Vector3 cameraPosition;
+
+    Quaternion playerRotation;
+    Quaternion playerOrientationPosition;
 
     //__________________________________________________________________________ Run
     void Start()
@@ -31,33 +38,46 @@ public class ThirdPersonCamScript : MonoBehaviour
     void Update()
     {
 
-            AimCameraSync();
-
-/*        if (Input.GetKey(KeyCode.Mouse1) == true)
+/*        if (Input.GetKey(KeyCode.W) == true) 
         {
-            mainCam.SetActive(false);
+            SyncCamDirToPlayerMovement();
+            return;
+        }*/
+
+
+        if (Input.GetKey(KeyCode.Mouse1) == true)
+        {
+            currentCam = aimCam;
+            freeCam.SetActive(false);
             aimCam.SetActive(true);
-            //aimCam.transform.rotation = cameraRotation;
-            //playerOrientation.rotation = playerRotation;
+
+            AimCameraSync();
         }
 
         else
         {
-            mainCam.SetActive(true);
+            currentCam = freeCam;
+            freeCam.SetActive(true);
             aimCam.SetActive(false);
-            SyncCamDirToPlayerMovement();
-
-        }*/
+            
+            ///AimCameraSync();
+            //SyncCamDirToPlayerMovement();
+        }
     }
 
     //__________________________________________________________________________ Mathods
+
+    private void switchCameraDelay()
+    {
+        cameraSwitched = false;
+    }
+
     private void Init()
     {
         player = GameObject.Find("Player").transform;
         playerObj = GameObject.Find("Player_OBJ").transform;
         playerOrientation = GameObject.Find("PlayerOrientation").transform;
         Cursor.lockState = CursorLockMode.Locked;
-
     }
 
     Vector3 viewDiraction;
@@ -65,8 +85,9 @@ public class ThirdPersonCamScript : MonoBehaviour
 
     private void SyncCamDirToPlayerMovement()
     {
-        viewDiraction = player.position - new Vector3(transform.position.x, player.position.y, transform.position.z);
+        viewDiraction = player.position - new Vector3(currentCam.transform.position.x, player.position.y, currentCam.transform.position.z);
         playerOrientation.forward = viewDiraction.normalized;
+        player.forward = viewDiraction.normalized;
 
         float horizontalInput = Input.GetAxisRaw("Horizontal");
         float verticalInput = Input.GetAxisRaw("Vertical");
@@ -80,14 +101,13 @@ public class ThirdPersonCamScript : MonoBehaviour
 
         //cameraRotation = mainCam.transform.rotation;
         //playerRotation = playerOrientation.rotation;
-
     }
 
 
-    float xMouseSensitivity;
-    float yMouseSensitivity;
     float xMouseRotation;
     float yMouseRotation;
+    float xMouseSensitivity;
+    float yMouseSensitivity;
 
     public void AimCameraSync()
     {
@@ -99,9 +119,13 @@ public class ThirdPersonCamScript : MonoBehaviour
 
         xMouseRotation = Mathf.Clamp(xMouseRotation, -40, 40);
 
-        transform.rotation = Quaternion.Euler(xMouseRotation, yMouseRotation, 0);
+        currentCam.transform.rotation = Quaternion.Euler(xMouseRotation, yMouseRotation, 0);
+        //player.rotation = Quaternion.Euler(0, yMouseRotation, 0);
         playerOrientation.rotation = Quaternion.Euler(0, yMouseRotation, 0);
         //playerObj.rotation = Quaternion.Euler(0, yMouseRotation, 0);
+
+        //viewDiraction = player.position - new Vector3(currentCam.transform.position.x, player.position.y, currentCam.transform.position.z);
+        //playerOrientation.forward = viewDiraction.normalized;
 
         //cameraRotation = aimCam.transform.rotation;
         //playerRotation = playerOrientation.rotation;
