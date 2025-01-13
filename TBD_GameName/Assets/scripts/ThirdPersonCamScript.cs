@@ -3,6 +3,8 @@ using Unity.Burst.Intrinsics;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Located on the camera itself and makes it move according to the mouse
@@ -13,97 +15,119 @@ public class ThirdPersonCamScript : MonoBehaviour
 
     //__________________________________________________________________________ Variables
     Transform player;
-    Transform playerObj;
-    Transform playerOrientation;
 
-    [SerializeField] GameObject currentCam;
+    [SerializeField] GameObject mainCam;
     [SerializeField] GameObject freeCam;
     [SerializeField] GameObject aimCam;
 
     [SerializeField] private float mouseSensitivity = 400f;
-    [SerializeField] private bool cameraSwitched = true;
 
-    Quaternion cameraRotation;
-    Vector3 cameraPosition;
+    [SerializeField] bool camSwitched = true;
 
-    Quaternion playerRotation;
-    Quaternion playerOrientationPosition;
+    Vector3 mainCamTrans;
 
     //__________________________________________________________________________ Run
     void Start()
     {
-        Init();
+        player = GameObject.Find("Player").transform;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
+    private void LateUpdate()
+    {
+
     }
 
     void Update()
     {
-
+        //mainCamTrans = mainCam.transform.rotation;
 
 
         if (Input.GetKey(KeyCode.Mouse1) == true)
         {
-            currentCam = aimCam;
+
             freeCam.SetActive(false);
-            aimCam.SetActive(true);
+            //aimCam.SetActive(true);
+                AimCameraSync();
 
-/*            if (cameraSwitched == true )
+            if (camSwitched == true)
             {
-                cameraRotation = currentCam.transform.rotation;
-                cameraPosition = currentCam.transform.position;
-                playerRotation = player.transform.rotation;
-                playerOrientationPosition = playerOrientation.transform.rotation;
-                cameraSwitched = false;
+                aimCam.transform.localRotation = mainCam.transform.rotation;
+                player.transform.rotation = mainCam.transform.rotation;
+
+                //mouseRotation = mainCam.transform.rotation;
+
+                mouseRotation.x = mainCam.transform.eulerAngles.x;
+                mouseRotation.y = mainCam.transform.eulerAngles.y;
+
+
+                //Invoke(nameof(zzzzzz), 3);
+                camSwitched = false;
             }
-
-            currentCam.transform.rotation = cameraRotation;
-            currentCam.transform.position = cameraPosition;
-            player.transform.rotation = playerRotation;
-            playerOrientation.transform.rotation = playerOrientationPosition;*/
-
-
-            AimCameraSync();
         }
 
         else
         {
-            currentCam = freeCam;
+            camSwitched = true;
             freeCam.SetActive(true);
-            aimCam.SetActive(false);
-
-/*            if (cameraSwitched == true)
-            {
-                cameraRotation = currentCam.transform.rotation;
-                cameraPosition = currentCam.transform.position;
-                playerRotation = player.transform.rotation;
-                playerOrientationPosition = playerOrientation.transform.rotation;
-                Invoke(nameof(switchCameraDelay), 3);
-            }
-
-            currentCam.transform.rotation = cameraRotation;
-            currentCam.transform.position = cameraPosition;
-            player.transform.rotation = playerRotation;
-            playerOrientation.transform.rotation = playerOrientationPosition;*/
-            AimCameraSync();
-            //SyncCamDirToPlayerMovement();
+            //aimCam.SetActive(false);
         }
     }
 
     //__________________________________________________________________________ Mathods
 
-    private void switchCameraDelay()
+    private void zzzzzz()
     {
-        cameraSwitched = false;
+        camSwitched = false;
     }
 
-    private void Init()
+
+    float xMouseSensitivity;
+    float yMouseSensitivity;
+
+    //public float xMouseRotation;
+    //public float yMouseRotation;
+
+    Quaternion mouseRotation;
+
+    public void AimCameraSync()
     {
-        player = GameObject.Find("Player").transform;
-        playerObj = GameObject.Find("Player_OBJ").transform;
-        playerOrientation = GameObject.Find("PlayerOrientation").transform;
-        Cursor.lockState = CursorLockMode.Locked;
+
+        //float x = 
+
+        xMouseSensitivity = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        yMouseSensitivity = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+
+        mouseRotation.x -= yMouseSensitivity;
+        mouseRotation.y += xMouseSensitivity;
+
+        mouseRotation.x = Mathf.Clamp(mouseRotation.x, -40, 40);
+
+        aimCam.transform.rotation = Quaternion.Euler(mouseRotation.x, mouseRotation.y, 0);
+        player.rotation = Quaternion.Euler(0, mouseRotation.y, 0);
+
     }
 
-    Vector3 viewDiraction;
+
+    /*    public void AimCameraSync()
+        {
+
+            xMouseSensitivity = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+            yMouseSensitivity = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+
+            xMouseRotation -= yMouseSensitivity;
+            yMouseRotation += xMouseSensitivity;
+
+            xMouseRotation = Mathf.Clamp(xMouseRotation, -40, 40);
+
+            aimCam.transform.rotation = Quaternion.Euler(xMouseRotation, yMouseRotation, 0);
+            player.rotation = Quaternion.Euler(0, yMouseRotation, 0);
+
+        }*/
+
+}
+
+/*    Vector3 viewDiraction;
     Vector3 inputDir;
 
     private void SyncCamDirToPlayerMovement()
@@ -123,34 +147,28 @@ public class ThirdPersonCamScript : MonoBehaviour
 
         //cameraRotation = mainCam.transform.rotation;
         //playerRotation = playerOrientation.rotation;
-    }
+    }*/
 
 
-    float xMouseSensitivity;
-    float yMouseSensitivity;
-    float xMouseRotation;
-    float yMouseRotation;
-
-    public void AimCameraSync()
+/*    private void xxx()
     {
 
-        xMouseSensitivity = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        yMouseSensitivity = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-        xMouseRotation -= yMouseSensitivity;
-        yMouseRotation += xMouseSensitivity;
+        camAxis.x = Input.GetAxis("Mouse X") * turnSpeed * Time.deltaTime;
+        camAxis.y = Input.GetAxis("Mouse Y") * turnSpeed * Time.deltaTime;
 
-        xMouseRotation = Mathf.Clamp(xMouseRotation, -40, 40);
+        camAxis.x = Mathf.Clamp(camAxis.x, -40, 40);
 
-        currentCam.transform.rotation = Quaternion.Euler(xMouseRotation, yMouseRotation, 0);
-        //player.rotation = Quaternion.Euler(0, yMouseRotation, 0);
+
+
+        player.rotation = Quaternion.Euler(0, yMouseRotation, 0);
         playerOrientation.rotation = Quaternion.Euler(0, yMouseRotation, 0);
-        //playerObj.rotation = Quaternion.Euler(0, yMouseRotation, 0);
 
-        //viewDiraction = player.position - new Vector3(currentCam.transform.position.x, player.position.y, currentCam.transform.position.z);
-        //playerOrientation.forward = viewDiraction.normalized;
+        //transform.localRotation = Quaternion.Euler(-camAxis.y, +camAxis.x, 0);
 
-        //cameraRotation = aimCam.transform.rotation;
-        //playerRotation = playerOrientation.rotation;
-    }
+        if (camAxis != Vector2.zero)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(camAxis, Vector3.up);
 
-}
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, turnSpeed);
+        }
+    }*/

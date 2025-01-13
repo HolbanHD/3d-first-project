@@ -38,6 +38,8 @@ public class PlayerMovement : MonoBehaviour
     private float horizontalInput;
     private float verticalInput;
 
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private float rotationSpeed;
 
     //__________________________________________________________________________ Run
     private void Start()
@@ -104,6 +106,19 @@ public class PlayerMovement : MonoBehaviour
     {
         //calculate movement direction
         moveDirection = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
+        moveDirection = new Vector3(horizontalInput, 0, verticalInput);
+        float inputMagnitude = Mathf.Clamp01(moveDirection.magnitude);
+
+        moveDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * moveDirection;
+        moveDirection.Normalize();
+
+        if (moveDirection != Vector3.zero)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+        }
+
 
         //adding force for movement on ground
         if (onGround)

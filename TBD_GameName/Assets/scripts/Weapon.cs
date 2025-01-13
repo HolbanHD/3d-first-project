@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using TMPro;
 using UnityEngine;
+using Cinemachine;
 
 public abstract class Weapon : MonoBehaviour, IShootable
 {
@@ -22,7 +23,16 @@ public abstract class Weapon : MonoBehaviour, IShootable
 
     [SerializeField] protected int bulletsShot;
 
-    [SerializeField] protected Camera aimCamera;
+
+    //[SerializeField] protected Camera freeCamera;
+    [SerializeField] protected Camera mainCamera;
+
+    [SerializeField] protected GameObject freeCamera;
+    [SerializeField] protected GameObject aimCamera;
+
+    //[SerializeField] protected CinemachineVirtualCamera freeCMCamera;
+    //[SerializeField] protected CinemachineVirtualCamera aimCMCamera;
+
     [SerializeField] protected Transform shootingPoint;
     [SerializeField] protected GameObject projectileType;
 
@@ -41,6 +51,23 @@ public abstract class Weapon : MonoBehaviour, IShootable
 
     void Start()
     {
+
+    }
+
+    private void LateUpdate()
+    {
+/*        if (Input.GetKey(KeyCode.Mouse1))
+        {
+            //freeCMCamera.enabled = false;
+            freeCamera.SetActive(false);
+            //aimCMCamera.enabled = true;
+            aimCamera.SetActive(true);
+        }
+        else
+        {
+            freeCamera.SetActive(true);
+            aimCamera.SetActive(false);
+        }*/
 
     }
 
@@ -87,7 +114,7 @@ public abstract class Weapon : MonoBehaviour, IShootable
     {
         readyToShoot = false;
 
-        Ray ray = aimCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
         Vector3 targetPoint;
@@ -116,10 +143,10 @@ public abstract class Weapon : MonoBehaviour, IShootable
         }
 
         //shottgun
-/*        if (bulletsShot < bulletsInShootgunShell && currentAmmo > 0)
-        {
-            Invoke(nameof(Shoot), rateOfFire);
-        }*/
+        /*        if (bulletsShot < bulletsInShootgunShell && currentAmmo > 0)
+                {
+                    Invoke(nameof(Shoot), rateOfFire);
+                }*/
     }
 
     protected void ResetShoot()
