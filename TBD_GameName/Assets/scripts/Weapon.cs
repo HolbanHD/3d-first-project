@@ -4,6 +4,11 @@ using Unity.VisualScripting;
 using TMPro;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.EventSystems;
+
+/// <summary>
+/// an abstract class holding the basic every weapon data and functions
+/// </summary>
 
 public abstract class Weapon : MonoBehaviour, IShootable
 {
@@ -16,23 +21,17 @@ public abstract class Weapon : MonoBehaviour, IShootable
     [SerializeField] protected float rateOfFire;
     [SerializeField] protected float spread;
     [SerializeField] protected int magSize;
+    //[SerializeField] protected float bulletsInShotgunShell;
+    [SerializeField] protected bool triggerPulled;
+    [SerializeField] protected bool fireModeAuto;
+    [SerializeField] protected bool gunCycled;
+    [SerializeField] protected bool reloading;
     [SerializeField] protected float reloadTime;
-    //[SerializeField] protected float bulletsInShootgunShell;
-    [SerializeField] protected bool shooting, readyToShoot, reloading, fireModeAuto;
-    //[SerializeField] protected string fireMode;
-
     [SerializeField] protected int bulletsShot;
 
-
-    //[SerializeField] protected Camera freeCamera;
     [SerializeField] protected Camera mainCamera;
 
-    [SerializeField] protected GameObject freeCamera;
-    [SerializeField] protected GameObject aimCamera;
-
-    //[SerializeField] protected CinemachineVirtualCamera freeCMCamera;
-    //[SerializeField] protected CinemachineVirtualCamera aimCMCamera;
-
+    [SerializeField] protected Transform gunTransform;
     [SerializeField] protected Transform shootingPoint;
     [SerializeField] protected GameObject projectileType;
 
@@ -40,35 +39,14 @@ public abstract class Weapon : MonoBehaviour, IShootable
     //[SerializeField] protected TextMeshProUGUI ammoDisplay;
 
     private bool allowInvoke = true;
+    Vector3 targetPoint;
 
     //__________________________________________________________________________ Run
 
     private void Awake()
     {
         currentAmmo = magSize;
-        readyToShoot = true;
-    }
-
-    void Start()
-    {
-
-    }
-
-    private void LateUpdate()
-    {
-/*        if (Input.GetKey(KeyCode.Mouse1))
-        {
-            //freeCMCamera.enabled = false;
-            freeCamera.SetActive(false);
-            //aimCMCamera.enabled = true;
-            aimCamera.SetActive(true);
-        }
-        else
-        {
-            freeCamera.SetActive(true);
-            aimCamera.SetActive(false);
-        }*/
-
+        gunCycled = true;
     }
 
     void Update()
@@ -78,12 +56,15 @@ public abstract class Weapon : MonoBehaviour, IShootable
 
     //__________________________________________________________________________ Methods
 
+    //inputs for shooting and reloading.
     protected void GunInput()
     {
-        if (fireModeAuto) shooting = Input.GetKey(KeyCode.Mouse0);
-        else shooting = Input.GetKeyDown(KeyCode.Mouse0);
+        //input by gun shooting mode.
+        if (fireModeAuto) triggerPulled = Input.GetKey(KeyCode.Mouse0);
+        else triggerPulled = Input.GetKeyDown(KeyCode.Mouse0);
 
-        if (readyToShoot && shooting && !reloading && currentAmmo > 0)
+        //checking in gun done cycling between shots, there is input, not mid reloading and bullets in current mag is not 0.
+        if (gunCycled && triggerPulled && !reloading && currentAmmo > 0)
         {
             bulletsShot = 0;
             Shoot();
@@ -95,29 +76,14 @@ public abstract class Weapon : MonoBehaviour, IShootable
         }
     }
 
-    //protected void SetGunType(string gunType) { this.gunType = gunType; }
-
-    public void Reload()
-    {
-        //reloading
-        reloading = true;
-        Invoke(nameof(ReloadingDone), reloadTime);
-    }
-
-    protected void ReloadingDone()
-    {
-        currentAmmo = magSize;
-        reloading = false;
-    }
-
     public void Shoot()
     {
-        readyToShoot = false;
+        gunCycled = false;
 
         Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
-        Vector3 targetPoint;
+        //Vector3 targetPoint;
         if (Physics.Raycast(ray, out hit)) targetPoint = hit.point;
         else targetPoint = ray.GetPoint(75);
 
@@ -142,18 +108,33 @@ public abstract class Weapon : MonoBehaviour, IShootable
             allowInvoke = false;
         }
 
-        //shottgun
-        /*        if (bulletsShot < bulletsInShootgunShell && currentAmmo > 0)
-                {
-                    Invoke(nameof(Shoot), rateOfFire);
-                }*/
     }
+
+    public void Reload()
+    {
+        reloading = true;
+        Invoke(nameof(ReloadingDone), reloadTime);
+    }
+
+    protected void ReloadingDone()
+    {
+        currentAmmo = magSize;
+        reloading = false;
+    }
+
 
     protected void ResetShoot()
     {
-        readyToShoot = true;
+        gunCycled = true;
         allowInvoke = true;
     }
+
+    protected void RotateGunOnUp()
+    {
+
+    }
+
+}
 
     /*private void UI_ShowAmmo()
     {
@@ -170,4 +151,9 @@ public abstract class Weapon : MonoBehaviour, IShootable
             Instantiate(muzzleFlash,shootingPoint.position, Quaternion.identity);
         }
     }*/
-}
+
+        //shottgun
+        /*        if (bulletsShot < bulletsInShootgunShell && currentAmmo > 0)
+                {
+                    Invoke(nameof(Shoot), rateOfFire);
+                }*/
