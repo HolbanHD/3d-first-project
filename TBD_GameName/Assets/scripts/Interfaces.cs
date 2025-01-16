@@ -9,7 +9,7 @@ public interface IShootable
 //an interface that will be referenced on all type of objects that will take damage and die or destroyed 
 public interface IDamageable
 {
-    void GiveDamage(int damageAmount);
+    void TakeDamage(int damageAmount);
     void Death();
 }
 

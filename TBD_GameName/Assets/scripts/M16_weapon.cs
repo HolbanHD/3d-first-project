@@ -19,6 +19,8 @@ public class M16_weapon : Weapon
     [SerializeField] private GameObject bulletCaseType;
     [SerializeField] private GameObject magToDrop;
 
+    Rigidbody caseRB;
+
     //__________________________________________________________________________ Run
 
 
@@ -27,21 +29,24 @@ public class M16_weapon : Weapon
     protected override void Shoot()
     {
         base.Shoot();
-        Vector3 caseDirNoSpread = transform.right;
+        Vector3 caseDirNoSpread = transform.right*-1;
 
         float x = Random.Range(-caseSpread, caseSpread);
         float y = Random.Range(-caseSpread, caseSpread);
         
         Vector3 caseDirWithSpread = caseDirNoSpread + new Vector3 (-x,y,0);
 
-        GameObject bullet = Instantiate(projectileType, transform.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody>().AddForce(caseDirWithSpread.normalized * caseVelocity, ForceMode.Impulse);
+        GameObject bulletCaseSpawnd = Instantiate(bulletCaseType, transform.position, magPosition.transform.localRotation);
+        caseRB = bulletCaseSpawnd.GetComponent<Rigidbody>();
+        caseRB.AddForce(caseDirWithSpread.normalized * caseVelocity, ForceMode.Impulse);
+        caseRB.AddTorque(new Vector3(0,0,1), ForceMode.Impulse);
     }
 
     protected override void Reload()
     {
         base.Reload();
-        magToDrop = Instantiate(magToDrop, magPosition.position,magPosition.transform.rotation);
+        GameObject magToDropKKK = Instantiate(magToDrop, magPosition.position,magPosition.transform.rotation);
+        Destroy(magToDropKKK, 10);
     }
 
 }
