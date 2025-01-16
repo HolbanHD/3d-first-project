@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 /// an abstract class holding the basic every weapon data and functions
 /// </summary>
 
-public abstract class Weapon : MonoBehaviour, IShootable
+public abstract class Weapon : MonoBehaviour//, //IShootable
 {
     //__________________________________________________________________________ Variables
 
@@ -76,14 +76,16 @@ public abstract class Weapon : MonoBehaviour, IShootable
         }
     }
 
-    public void Shoot()
+    //spawn a bullet at shootingPint transform to direction of middle of screen, adding force from this script. (not form bullet at "start")
+    protected virtual void Shoot()
     {
         gunCycled = false;
 
+        //rey to middle of screen
         Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
-        //Vector3 targetPoint;
+        //if hit object else: distance of 75
         if (Physics.Raycast(ray, out hit)) targetPoint = hit.point;
         else targetPoint = ray.GetPoint(75);
 
@@ -94,14 +96,15 @@ public abstract class Weapon : MonoBehaviour, IShootable
 
         Vector3 directionWithSpread = directionNoSpread + new Vector3(-x, y, 0);
 
+        // spawn, direction , getting bullet rigidbody and adding impulse force.
         GameObject bullet = Instantiate(projectileType, shootingPoint.position, Quaternion.identity);
-        bullet.transform.forward = directionWithSpread.normalized.normalized;
-
+        bullet.transform.forward = directionWithSpread.normalized;
         bullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * projectileVelocity, ForceMode.Impulse);
 
         currentAmmo--;
         bulletsShot++;
 
+        //timing between shots.
         if (allowInvoke)
         {
             Invoke(nameof(ResetShoot), rateOfFire);
@@ -110,7 +113,13 @@ public abstract class Weapon : MonoBehaviour, IShootable
 
     }
 
-    public void Reload()
+    protected void ResetShoot()
+    {
+        gunCycled = true;
+        allowInvoke = true;
+    }
+
+    protected virtual void Reload()
     {
         reloading = true;
         Invoke(nameof(ReloadingDone), reloadTime);
@@ -122,27 +131,12 @@ public abstract class Weapon : MonoBehaviour, IShootable
         reloading = false;
     }
 
-
-    protected void ResetShoot()
-    {
-        gunCycled = true;
-        allowInvoke = true;
-    }
-
     protected void RotateGunOnUp()
     {
 
     }
-
 }
 
-    /*private void UI_ShowAmmo()
-    {
-        if (ammoDisplay != null)
-        {
-            ammoDisplay.SetText(currentAmmo / bulletsInShootgunShell + "/" + magSize / bulletsInShootgunShell);
-        }
-    }*/
 
     /*private void MuzzleFlash()
     {
