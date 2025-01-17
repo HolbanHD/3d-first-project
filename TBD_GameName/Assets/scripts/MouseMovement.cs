@@ -4,7 +4,7 @@ using UnityEngine;
 /// Located on the camera itself and makes it move according to the mouse
 /// </summary>
 
-public class NouseMovement : MonoBehaviour
+public class MouseMovement : MonoBehaviour
 {
     //__________________________________________________________________________ Variables
     [SerializeField] private float mouseSensitivity = 400f;

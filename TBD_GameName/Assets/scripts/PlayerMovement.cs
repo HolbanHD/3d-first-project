@@ -27,47 +27,29 @@ public class PlayerMovement : MonoBehaviour
     private bool canJump;
 
     //on ground check
-    [SerializeField] private float playerHeight;
+    [SerializeField] private Transform sphereForGroundCheck;
+    [SerializeField] private float groundDistance;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private bool onGround;
-
-    [SerializeField] private Transform playerOrientation;
 
     private Vector3 moveDirection;
 
     private float horizontalInput;
     private float verticalInput;
 
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private float playerRotationSpeed;
 
     //__________________________________________________________________________ Run
     private void Start()
     {
-        playerOrientation = transform.GetChild(0);
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
-
-        canJump = true;
-        currentSpeed = defaultSpeed;
+        Init();
     }
 
     private void Update()
     {
-        //ground chack, by shooting raycast down that finds a layer of ground
-
-        ///<summary>
-        /// change the ground check method!!!!!!!!!!!!!!!!!!!!!
-        /// </summary>
-
-
-        onGround = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundLayer);
-
-        //adding drag on ground with Rigidbody
-        if (onGround)
-            rb.drag = groundDrag;
-        else
-            rb.drag = 0;
-
         PlayerInput();
+        GroundCheck();
     }
 
     private void FixedUpdate()
@@ -79,6 +61,18 @@ public class PlayerMovement : MonoBehaviour
 
 
     //__________________________________________________________________________ Methods
+
+    private void Init()
+    {
+        cameraTransform = Camera.main.transform;
+        sphereForGroundCheck = transform.GetChild(0);
+        rb = GetComponent<Rigidbody>();
+        rb.freezeRotation = true;
+
+        canJump = true;
+        currentSpeed = defaultSpeed;
+    }
+
     //gets input and sets different speeds 
     private void PlayerInput()
     {
@@ -103,7 +97,24 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayer()
     {
         //calculate movement direction
-        moveDirection = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
+        //moveDirection = playerOrientation.forward * verticalInput + playerOrientation.right * horizontalInput;
+        moveDirection = new Vector3(horizontalInput, 0, verticalInput);
+        float inputMagnitude = Mathf.Clamp01(moveDirection.magnitude);
+
+        moveDirection = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up) * moveDirection;
+        moveDirection.Normalize();
+
+        if (moveDirection != Vector3.zero)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotation, playerRotationSpeed * Time.deltaTime);
+        }
+
+        //adding drag on ground with Rigidbody
+        if (onGround)
+            rb.drag = groundDrag;
+        else
+            rb.drag = 0;
 
         //adding force for movement on ground
         if (onGround)
@@ -114,8 +125,8 @@ public class PlayerMovement : MonoBehaviour
         //adding force for movement in air and gravity simulation
         else
         {
-            rb.AddForce(moveDirection.normalized * inAirMoveSpeed * 10f * currentSpeed, ForceMode.Force);
-            rb.AddForce(Vector3.down.normalized * playerGravity * 10f, ForceMode.Force); 
+            rb.AddForce(moveDirection.normalized * inAirMoveSpeed * 10f * currentSpeed * Time.deltaTime, ForceMode.Force);
+            rb.AddForce(Vector3.down.normalized * playerGravity * 10f * Time.deltaTime, ForceMode.Force); 
         }
 
     }
@@ -130,6 +141,11 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(transform.up * jumpForce + moveDirection * currentSpeed, ForceMode.Impulse);
             Invoke(nameof(ResetJump), jumpCooldown);
         }
+    }
+
+    private void GroundCheck()
+    {
+        onGround = Physics.CheckSphere(sphereForGroundCheck.position, 0.5f, groundLayer);
     }
 
     //calculate and limit the player speed
