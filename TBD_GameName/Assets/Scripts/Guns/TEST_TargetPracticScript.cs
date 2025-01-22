@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TEST_TargetPracticScript : MonoBehaviour,IDamageable
+public class TEST_TargetPracticScript : MonoBehaviour,IDamagable
 {
 
     [SerializeField] private int health = 100;
