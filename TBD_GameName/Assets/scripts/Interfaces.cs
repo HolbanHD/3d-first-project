@@ -13,3 +13,7 @@ public interface IDamageable
     void Death();
 }
 
+public interface ICollectable
+{
+    void Collect();
+}
