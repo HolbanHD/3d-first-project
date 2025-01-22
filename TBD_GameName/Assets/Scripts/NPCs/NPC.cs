@@ -4,13 +4,16 @@ using UnityEngine.AI;
 
 namespace NPC
 {
+    /// <summary>
+    /// Base class for defining npcs
+    /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     public abstract class NPC : MonoBehaviour, IDamagable
     {
         [SerializeField] protected NPCData data;
 
         protected float currentHealth;
-        protected NavMeshAgent agent;
+        public NavMeshAgent Agent { get; private set; }
 
         protected virtual void Awake()
         {
@@ -19,13 +22,8 @@ namespace NPC
 
         protected virtual void Init()
         {
-            agent = GetComponent<NavMeshAgent>();
+            Agent = GetComponent<NavMeshAgent>();
             currentHealth = data.MaxHealth;
-        }
-
-        public virtual void MoveTo(Vector3 position)
-        {
-            agent.SetDestination(position);
         }
 
         public virtual void TakeDamage(float damage)
