@@ -19,6 +19,9 @@ public class ItemUI : MonoBehaviour
         itemImage = GetComponent<Image>();
         countText = GetComponentInChildren<TMP_Text>();
 
+        itemButtonManager.AddListenerToMouseOnItem(SetInfoText);
+        itemButtonManager.AddListenerToMouseOffItem(ClearInfoText);
+
     }
 
     public void SetData(ItemDataSO itemDataSO , int count , string infoText)

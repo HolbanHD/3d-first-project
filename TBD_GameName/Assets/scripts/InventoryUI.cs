@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine;
 
 public class InventoryUI : MonoBehaviour
@@ -12,12 +13,17 @@ public class InventoryUI : MonoBehaviour
         inventoryManager = FindAnyObjectByType<InventoryManager>();
     }
 
+    private void Start()
+    {
+        inventoryManager.AddListenerToEvent(UpdateUI);
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             gameObject.GetComponentInParent<Canvas>().enabled = !gameObject.GetComponentInParent<Canvas>().isActiveAndEnabled;
-            UpdateUi();
+            UpdateUI();
 
         }
     }
@@ -39,7 +45,7 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
-    public void UpdateUi()
+    public void UpdateUI()
     {
         CleanUi();
         ShowUi();
