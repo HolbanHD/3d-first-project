@@ -1,9 +1,7 @@
 {
-    "name": "NPC",
-    "rootNamespace": "NPC",
-    "references": [
-        "GUID:501636b365d43154c91487594166bda0"
-    ],
+    "name": "Interfaces",
+    "rootNamespace": "Interfaces",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
