@@ -1,7 +1,7 @@
 
 namespace interfaces
 {
-    public interface IDamagable
+    public interface IDamageable
     {
         void TakeDamage(int damageAmount);
         void Death();

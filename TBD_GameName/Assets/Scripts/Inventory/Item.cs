@@ -1,29 +1,34 @@
+using interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour, ICollectable
+namespace Inventory
 {
 
-    [SerializeField] private ItemDataSO itemDataSO;
-    private ItemData itemData;
-    private InventoryManager inventoryManager;
-    //private SpriteRenderer spriteRenderer;
-
-    private void Awake()
+    public class Item : MonoBehaviour, ICollectable
     {
-        inventoryManager = FindObjectOfType<InventoryManager>();
-        SetDataValues();
-    }
 
-    private void SetDataValues()
-    {
-        itemData = new ItemData(itemDataSO);
-    }
+        [SerializeField] private ItemDataSO itemDataSO;
+        private ItemData itemData;
+        private InventoryManager inventoryManager;
+        //private SpriteRenderer spriteRenderer;
 
-    public void Collect()
-    {
-        inventoryManager.AddToInventory(itemDataSO, itemData);
-    }
+        private void Awake()
+        {
+            inventoryManager = FindObjectOfType<InventoryManager>();
+            SetDataValues();
+        }
 
+        private void SetDataValues()
+        {
+            itemData = new ItemData(itemDataSO);
+        }
+
+        public void Collect()
+        {
+            inventoryManager.AddToInventory(itemDataSO, itemData);
+        }
+    }
 }
+

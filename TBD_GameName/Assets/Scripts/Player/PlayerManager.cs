@@ -1,16 +1,19 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using interfaces;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour
+namespace player
 {
-    private void OnCollisionEnter(Collision collision)
+
+    public class PlayerManager : MonoBehaviour
     {
-        if(collision.gameObject.TryGetComponent<ICollectable>(out ICollectable icollectable))
+        private void OnCollisionEnter(Collision collision)
         {
-            icollectable.Collect();
-            Destroy(collision.gameObject);
+            if (collision.gameObject.TryGetComponent<ICollectable>(out ICollectable icollectable))
+            {
+                icollectable.Collect();
+                Destroy(collision.gameObject);
+            }
         }
     }
 }
+

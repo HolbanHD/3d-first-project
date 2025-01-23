@@ -3,23 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemData
+namespace Inventory
 {
-    public ItemDataSO itemSO;
-    public int pickupAmount;
-    public int amountInInventory {  get; private set; }
 
-
-    public ItemData(ItemDataSO itemSO)
+    public class ItemData
     {
-        this.itemSO = itemSO;
-        pickupAmount = itemSO.pickupAmount;
-        amountInInventory = itemSO.defaultAmount;
-    }
+        public ItemDataSO itemSO;
+        public int pickupAmount;
+        public int amountInInventory { get; private set; }
 
-    public void SetInventoryAmount(int amount)
-    {
-        amountInInventory = Mathf.Max(0, amountInInventory + amount);
-    }
 
+        public ItemData(ItemDataSO itemSO)
+        {
+            this.itemSO = itemSO;
+            pickupAmount = itemSO.pickupAmount;
+            amountInInventory = itemSO.defaultAmount;
+        }
+
+        public void SetInventoryAmount(int amount)
+        {
+            amountInInventory = Mathf.Max(0, amountInInventory + amount);
+        }
+    }
 }
+

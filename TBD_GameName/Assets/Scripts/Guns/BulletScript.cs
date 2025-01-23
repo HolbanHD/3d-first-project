@@ -1,28 +1,35 @@
+using interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletScript : MonoBehaviour
+
+namespace Guns
 {
 
-    [SerializeField] int destroyTime = 3;
-    void Start()
+    public class BulletScript : MonoBehaviour
     {
 
-    }
-
-    void Update()
-    {
-        Destroy(gameObject, destroyTime);
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.TryGetComponent<IDamageable>(out IDamageable iDamageable))
+        [SerializeField] int destroyTime = 3;
+        void Start()
         {
-            iDamageable.TakeDamage(10);
+
         }
-        Destroy(gameObject);
+
+        void Update()
+        {
+            Destroy(gameObject, destroyTime);
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.TryGetComponent<IDamageable>(out IDamageable iDamageable))
+            {
+                iDamageable.TakeDamage(10);
+            }
+            Destroy(gameObject);
+        }
+
     }
 
 }

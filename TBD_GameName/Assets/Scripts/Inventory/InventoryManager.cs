@@ -3,34 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class InventoryManager : MonoBehaviour
+namespace Inventory
 {
-    private Dictionary<ItemDataSO,ItemData> _itemInventory = new Dictionary<ItemDataSO,ItemData>();
-    [SerializeField] private UnityEvent updateInventoryUI;
 
-    public void AddToInventory(ItemDataSO itemDataSO , ItemData itemData)
+    public class InventoryManager : MonoBehaviour
     {
-        if (_itemInventory.ContainsKey(itemDataSO))
+        private Dictionary<ItemDataSO, ItemData> _itemInventory = new Dictionary<ItemDataSO, ItemData>();
+        [SerializeField] private UnityEvent updateInventoryUI;
+
+        public void AddToInventory(ItemDataSO itemDataSO, ItemData itemData)
         {
-            _itemInventory[itemDataSO].SetInventoryAmount(itemData.pickupAmount);
+            if (_itemInventory.ContainsKey(itemDataSO))
+            {
+                _itemInventory[itemDataSO].SetInventoryAmount(itemData.pickupAmount);
+            }
+            else
+            {
+                _itemInventory.Add(itemDataSO, itemData);
+                itemData.SetInventoryAmount(itemData.pickupAmount);
+                print("kkk");
+            }
         }
-        else
+
+        public Dictionary<ItemDataSO, ItemData> GetItemInventory() { return _itemInventory; }
+
+        public int getKeyAmount(ItemDataSO itemDataSO)
         {
-            _itemInventory.Add(itemDataSO, itemData);
-            itemData.SetInventoryAmount(itemData.pickupAmount);
-            print("kkk");
+            return _itemInventory[itemDataSO].amountInInventory;
         }
-    }
 
-    public Dictionary <ItemDataSO,ItemData> GetItemInventory() {  return _itemInventory; }
-
-    public int getKeyAmount(ItemDataSO itemDataSO)
-    {
-        return _itemInventory[itemDataSO].amountInInventory;
-    }
-
-    public void AddListenerToEvent(UnityAction action)
-    {
-        updateInventoryUI.AddListener(action);
+        public void AddListenerToEvent(UnityAction action)
+        {
+            updateInventoryUI.AddListener(action);
+        }
     }
 }
+

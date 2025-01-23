@@ -1,22 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// A script that is on the camera holder and assigns it to the selected location on the player.
 /// </summary>
 
-public class MoveCamera : MonoBehaviour
+namespace Player
 {
-    Transform cameraPosition;
 
-    void Start()
+    public class MoveCamera : MonoBehaviour
     {
-        cameraPosition = GameObject.Find("playerCameraPos").transform;
-    }
+        Transform cameraPosition;
 
-    void Update()
-    {
-        transform.position = cameraPosition.position;
+        void Start()
+        {
+            cameraPosition = GameObject.Find("playerCameraPos").transform;
+        }
+
+        void Update()
+        {
+            transform.position = cameraPosition.position;
+        }
     }
 }

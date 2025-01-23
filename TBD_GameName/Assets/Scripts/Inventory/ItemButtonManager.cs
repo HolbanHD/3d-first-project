@@ -4,40 +4,44 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class ItemButtonManager : MonoBehaviour
+namespace Inventory
 {
-    [SerializeField] private UnityEvent mouseOnIt;
-    [SerializeField] private UnityEvent mouseOffIt;
-    private Button button;
 
-    private void Awake()
+    public class ItemButtonManager : MonoBehaviour
     {
-        button = GetComponent<Button>();
-    }
+        [SerializeField] private UnityEvent mouseOnIt;
+        [SerializeField] private UnityEvent mouseOffIt;
+        private Button button;
 
-    private void OnMouseEnter()
-    {
-        mouseOnIt?.Invoke();
-    }
+        private void Awake()
+        {
+            button = GetComponent<Button>();
+        }
 
-    private void OnMouseExit()
-    {
-        mouseOffIt?.Invoke();
-    }
+        private void OnMouseEnter()
+        {
+            mouseOnIt?.Invoke();
+        }
 
-    public void AddListenerToMouseOnItem(UnityAction action)
-    {
-        mouseOnIt.AddListener(action);
-    }
+        private void OnMouseExit()
+        {
+            mouseOffIt?.Invoke();
+        }
 
-    public void AddListenerToMouseOffItem(UnityAction action)
-    {
-        mouseOffIt.AddListener(action);
-    }
+        public void AddListenerToMouseOnItem(UnityAction action)
+        {
+            mouseOnIt.AddListener(action);
+        }
 
-    public void AddListenerToMouseOnClick(UnityAction action)
-    {
-        button.onClick.AddListener(action);
-    }
+        public void AddListenerToMouseOffItem(UnityAction action)
+        {
+            mouseOffIt.AddListener(action);
+        }
 
+        public void AddListenerToMouseOnClick(UnityAction action)
+        {
+            button.onClick.AddListener(action);
+        }
+    }
 }
+
