@@ -19,6 +19,7 @@ namespace NPC
             {
                 stateManager.TransitionToState(new RoamState(this));
             }
+            stateManager.StateUpdate();
         }
 
         // Draw a gizmo in the Scene view to visualize the roam range
