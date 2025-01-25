@@ -1,7 +1,5 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using static Codice.Client.Common.WebApi.WebApiEndpoints;
 
 namespace NPC
 {
@@ -14,37 +12,69 @@ namespace NPC
 
         private Vector3 initialPosition;
 
-        private bool isMoving;
+        private float roamTimer;
 
         public override void Enter()
         {
             Debug.Log($"{npc.Data.NpcName} has entered RoamState");
             npc.Agent.isStopped = false;
             initialPosition = npc.transform.position;
+            roamTimer = .3f; // Small initial value to start roaming
         }
 
         public override void Exit()
         {
+
         }
 
         public override void Update()
         {
-            if (npc.Agent.remainingDistance <= npc.Agent.stoppingDistance) // Done with path
+            Roam();
+        }
+
+        /// <summary>
+        /// Handle roaming behavior
+        /// </summary>
+        private void Roam()
+        {
+            if (npc.Agent.remainingDistance > npc.Agent.stoppingDistance) return;
+
+            // If the agent has reached its destination
+            if (roamTimer > 0)
             {
-                Vector3 pos;
-                if (RandomPosition(initialPosition, npc.Data.RoamRange, out pos))
-                {
-                    npc.Agent.SetDestination(pos);
-                }
+                roamTimer -= Time.deltaTime;
+                if (roamTimer > 0) return; // Timer not done so exit method
             }
+
+            // Timer is done, so start a new timer and set a new destination
+            roamTimer = Random.Range(0, npc.Data.RoamDelayRange);
+            SetRandomDestination();
+        }
+
+        private void SetRandomDestination()
+        {
+            Vector3 pos;
+            if (TryGetRandomPosition(initialPosition, npc.Data.RoamRange, out pos))
+            {
+                npc.Agent.SetDestination(pos);
+                RandomizeAgentSpeed();
+            }
+        }
+
+        /// <summary>
+        /// Randomize speed to create varation based on NPC's SO
+        /// </summary>
+        private void RandomizeAgentSpeed()
+        {
+            npc.Agent.speed = Random.Range(npc.Data.MinMovespeed, npc.Data.MaxMovespeed);
+            npc.Agent.acceleration = Random.Range(npc.Data.MinAccelaration, npc.Data.MaxAccelaration);
         }
 
         /// <summary>
         /// Generate a random point within RoamRange,
         /// If point can find NavMesh within maxDistance, set result to found hit on NavMesh
         /// </summary>
-
-        private bool RandomPosition(Vector3 center, float range, out Vector3 result)
+        private bool TryGetRandomPosition(Vector3 center, float range, out Vector3 result)
         {
             // Generate a random point within RoamRange
             Vector3 randomPoint = new Vector3(
@@ -56,7 +86,6 @@ namespace NPC
             // If point can find NavMesh within maxDistance, set result to found hit on navMesh
             if (NavMesh.SamplePosition(randomPoint, out hit, 2.0f, NavMesh.AllAreas))
             {
-                npc.Agent.SetDestination(hit.position);
                 result = hit.position;
                 return true;
             }
