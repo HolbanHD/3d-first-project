@@ -11,17 +11,13 @@ namespace NPC
 
         public override void Enter()
         {
+            Debug.Log($"{npc.Data.NpcName} has entered IdleState");
             npc.Agent.isStopped = true;
         }
 
         public override void Exit()
         {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Update()
-        {
-            throw new System.NotImplementedException();
+            Debug.Log($"{npc.Data.NpcName} has exited IdleState");
         }
     }
 }

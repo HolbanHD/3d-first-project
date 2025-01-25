@@ -15,7 +15,7 @@ public class AgentController : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            agent.SetDestination(destination.position);
+            agent.Move(destination.position);
         }
     }
 }

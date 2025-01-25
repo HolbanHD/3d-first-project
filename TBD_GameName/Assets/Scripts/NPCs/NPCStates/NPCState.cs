@@ -1,5 +1,4 @@
 
-using UnityEngine;
 
 namespace NPC
 {
@@ -17,13 +16,10 @@ namespace NPC
 
         // Methods all states should implement
         public abstract void Enter();
-        public abstract void Update();
         public abstract void Exit();
-
-        // Methods several states share
-        protected void MoveTo(Vector3 position)
+        public void Update()
         {
-            npc.Agent.SetDestination(position);
+            // Default behavior is empty
         }
     }
 }

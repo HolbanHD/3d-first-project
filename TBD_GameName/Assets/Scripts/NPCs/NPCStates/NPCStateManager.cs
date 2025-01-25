@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace NPC
 {
     /// <summary>
@@ -23,7 +21,7 @@ namespace NPC
         /// <summary>
         /// Call Update() in the current state
         /// </summary>
-        public void UpdateState()
+        public void StateUpdate()
         {
             currentState?.Update();
         }
