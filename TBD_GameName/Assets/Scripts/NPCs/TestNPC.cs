@@ -4,12 +4,9 @@ namespace NPC
 {
     public class TestNPC : DamagableNPC
     {
-        private NPCStateManager stateManager;
-
         protected override void Init()
         {
             base.Init();
-            stateManager = new NPCStateManager();
             stateManager.TransitionToState(new IdleState(this));
         }
 

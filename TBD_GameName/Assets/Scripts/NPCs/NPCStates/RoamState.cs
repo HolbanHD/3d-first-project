@@ -13,6 +13,8 @@ namespace NPC
         private Vector3 initialPosition;
 
         private float roamTimer;
+        private float timeRoaming;
+        private float maxRoamTime = 6;
 
         public override void Enter()
         {
@@ -24,7 +26,7 @@ namespace NPC
 
         public override void Exit()
         {
-
+            Debug.Log($"{npc.Data.NpcName} has exited RoamState");
         }
 
         public override void Update()
@@ -37,17 +39,23 @@ namespace NPC
         /// </summary>
         private void Roam()
         {
-            if (npc.Agent.remainingDistance > npc.Agent.stoppingDistance) return;
+            timeRoaming += Time.deltaTime; // Count how much time passed since attempting to reach destination
+
+            if (timeRoaming < maxRoamTime) // If attempting to reach destination for less than maxRoamTime then check if destination reached. otherwise continue with finding new destination
+            {
+                if (npc.Agent.remainingDistance > npc.Agent.stoppingDistance) return;
+            }
 
             // If the agent has reached its destination
             if (roamTimer > 0)
             {
                 roamTimer -= Time.deltaTime;
                 if (roamTimer > 0) return; // Timer not done so exit method
+                timeRoaming = 0; // Reset time roaming
             }
 
             // Timer is done, so start a new timer and set a new destination
-            roamTimer = Random.Range(0, npc.Data.RoamDelayRange);
+            roamTimer = Random.Range(npc.Data.RoamDelayRange.x, npc.Data.RoamDelayRange.y);
             SetRandomDestination();
         }
 
@@ -66,8 +74,8 @@ namespace NPC
         /// </summary>
         private void RandomizeAgentSpeed()
         {
-            npc.Agent.speed = Random.Range(npc.Data.MinMovespeed, npc.Data.MaxMovespeed);
-            npc.Agent.acceleration = Random.Range(npc.Data.MinAccelaration, npc.Data.MaxAccelaration);
+            npc.Agent.speed = Random.Range(npc.Data.MovespeedRange.x, npc.Data.MovespeedRange.y);
+            npc.Agent.acceleration = Random.Range(npc.Data.AccelarationRange.x, npc.Data.AccelarationRange.y);
         }
 
         /// <summary>

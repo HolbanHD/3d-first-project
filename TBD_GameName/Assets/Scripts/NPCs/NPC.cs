@@ -9,9 +9,11 @@ namespace NPC
     [RequireComponent(typeof(NavMeshAgent))]
     public abstract class NPC : MonoBehaviour
     {
-        [SerializeField] private NPCData data;
+        [SerializeField] protected NPCData data;
         public NPCData Data => data; // public getter 
         public NavMeshAgent Agent { get; private set; }
+
+        protected NPCStateManager stateManager;
 
         [Header("Movement Settings")]
         [SerializeField] private bool isMovingNPC = false;  // Flag to determine if NPC will move
@@ -26,6 +28,7 @@ namespace NPC
         {
             if (isMovingNPC)
                 Agent = GetComponent<NavMeshAgent>();
+            stateManager = new NPCStateManager();
         }
     }
 }
