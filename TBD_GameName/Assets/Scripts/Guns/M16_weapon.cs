@@ -32,22 +32,25 @@ namespace Guns
         protected override void Shoot()
         {
             base.Shoot();
-            Vector3 caseDirNoSpread = transform.right * -1;
 
+            // direction to lunch bullet case with random spread. 
+            Vector3 caseDirNoSpread = transform.right * -1;
             float x = Random.Range(-caseSpread, caseSpread);
             float y = Random.Range(-caseSpread, caseSpread);
-
             Vector3 caseDirWithSpread = caseDirNoSpread + new Vector3(-x, y, 0);
 
-            GameObject bulletCaseSpawnd = Instantiate(bulletCaseType, transform.position, magPosition.transform.localRotation);
+            // spawning the bullet case and adding force and spin to it
+            GameObject bulletCaseSpawnd = Instantiate(bulletCaseType, transform.position, magPosition.transform.rotation);
             caseRB = bulletCaseSpawnd.GetComponent<Rigidbody>();
             caseRB.AddForce(caseDirWithSpread.normalized * caseVelocity, ForceMode.Impulse);
-            caseRB.AddTorque(new Vector3(0, 0, 1), ForceMode.Impulse);
+            caseRB.AddTorque(caseDirWithSpread,ForceMode.Impulse);
         }
 
         protected override void Reload()
         {
             base.Reload();
+
+            // spawning a magazine that drops when player reloading
             GameObject magToDropKKK = Instantiate(magToDrop, magPosition.position, magPosition.transform.rotation);
             Destroy(magToDropKKK, 10);
         }
