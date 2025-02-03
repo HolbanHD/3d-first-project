@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace NPC
 {
-    [CreateAssetMenu(fileName = "New AttackingNPC", menuName = "NPC/AttackingNPCData")]
-    public class AttackingNPCData : NPCData
+    [CreateAssetMenu(fileName = "New EnemyNPC", menuName = "NPC/EnemyNPCData")]
+    public class EnemyNPCData : NPCData
     {
         [Header("Attack Settings")]
 
