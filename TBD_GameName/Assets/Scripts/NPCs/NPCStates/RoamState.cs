@@ -1,3 +1,4 @@
+using Interfaces;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,7 +7,7 @@ namespace NPC
     /// <summary>
     /// State in which NPC roams around a set area
     /// </summary>
-    public class RoamState : NPCState
+    public class RoamState : NPCState, IUpdatableState
     {
         public RoamState(NPC npc) : base(npc) { } // RoamState constructor
 
@@ -29,7 +30,7 @@ namespace NPC
             Debug.Log($"{npc.Data.NpcName} has exited RoamState");
         }
 
-        public override void Update()
+        public void Update()
         {
             Roam();
         }
@@ -39,34 +40,71 @@ namespace NPC
         /// </summary>
         private void Roam()
         {
-            timeRoaming += Time.deltaTime; // Count how much time passed since attempting to reach destination
+            timeRoaming += Time.deltaTime; // Track how long NPC has been roaming
 
-            if (timeRoaming < maxRoamTime) // If attempting to reach destination for less than maxRoamTime then check if destination reached. otherwise continue with finding new destination
+            if (HasExceededMaxRoamTime() || HasReachedDestination())
             {
-                if (npc.Agent.remainingDistance > npc.Agent.stoppingDistance) return;
+                HandleRoamTimer();
             }
+        }
 
-            // If the agent has reached its destination
+        /// <summary>
+        /// Checks if the NPC has exceeded the maximum allowed roam time.
+        /// </summary>
+        private bool HasExceededMaxRoamTime()
+        {
+            return timeRoaming >= maxRoamTime;
+        }
+
+        /// <summary>
+        /// Checks if the NPC has reached its destination.
+        /// </summary>
+        private bool HasReachedDestination()
+        {
+            return npc.Agent.remainingDistance <= npc.Agent.stoppingDistance;
+        }
+
+        /// <summary>
+        /// Handles the roam timer logic. If the timer is active, it counts down, and if it reaches zero, a new destination is set.
+        /// </summary>
+        private void HandleRoamTimer()
+        {
             if (roamTimer > 0)
             {
                 roamTimer -= Time.deltaTime;
-                if (roamTimer > 0) return; // Timer not done so exit method
-                timeRoaming = 0; // Reset time roaming
+                if (roamTimer > 0) return; // Timer still active, so exit method
             }
 
-            // Timer is done, so start a new timer and set a new destination
-            roamTimer = Random.Range(npc.Data.RoamDelayRange.x, npc.Data.RoamDelayRange.y);
-            SetRandomDestination();
+            StartNewRoamCycle();
         }
 
-        private void SetRandomDestination()
+        /// <summary>
+        /// Resets roaming state and sets a new random destination.
+        /// </summary>
+        private void StartNewRoamCycle()
+        {
+            timeRoaming = 0; // Reset time roaming
+            roamTimer = Random.Range(npc.Data.RoamDelayRange.x, npc.Data.RoamDelayRange.y);
+            if (!TrySetRandomDestination())
+            {
+                roamTimer += Time.deltaTime; // Try again next frame
+            }
+        }
+
+        /// <summary>
+        /// Attempts to set a new random destination. Returns true if successful, false otherwise.
+        /// </summary>
+        private bool TrySetRandomDestination()
         {
             Vector3 pos;
             if (TryGetRandomPosition(initialPosition, npc.Data.RoamRange, out pos))
             {
                 npc.Agent.SetDestination(pos);
                 RandomizeAgentSpeed();
+                return true; // Successfully set a new destination
             }
+
+            return false; // No valid position found
         }
 
         /// <summary>
@@ -89,6 +127,7 @@ namespace NPC
                center.x + Random.insideUnitSphere.x * range,
                center.y, // Keep the same Y value
                center.z + Random.insideUnitSphere.z * range);
+
             NavMeshHit hit;
 
             // If point can find NavMesh within maxDistance, set result to found hit on navMesh

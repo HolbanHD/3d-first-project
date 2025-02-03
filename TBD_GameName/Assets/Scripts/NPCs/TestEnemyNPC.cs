@@ -17,7 +17,7 @@ namespace NPC
         {
             if (Input.GetMouseButtonDown(0))
             {
-                stateManager.TransitionToState(new PursuitState(this, target));
+                stateManager.TransitionToState(new PursuitState(this, target, 4));
             }
         }
     }

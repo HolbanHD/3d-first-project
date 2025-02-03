@@ -1,3 +1,5 @@
+using Interfaces;
+
 namespace NPC
 {
     /// <summary>
@@ -23,7 +25,10 @@ namespace NPC
         /// </summary>
         public void StateUpdate()
         {
-            currentState?.Update();
+            if (currentState is IUpdatableState updatableState)
+            {
+                updatableState.Update();
+            }
         }
     }
 }

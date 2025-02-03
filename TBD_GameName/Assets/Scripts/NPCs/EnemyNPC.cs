@@ -15,9 +15,11 @@ namespace NPC
             CheckCorrectNPCData();
         }
 
+        /// <summary>
+        /// Check if Data is of type EnemyNPCData and cache it in EnemyData
+        /// </summary>
         private void CheckCorrectNPCData()
         {
-            // Check if Data is of type EnemyNPCData and cache it in EnemyData
             if (Data is EnemyNPCData data)
             {
                 attackingData = data;

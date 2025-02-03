@@ -16,11 +16,5 @@ namespace NPC
         // Methods all states should implement
         public abstract void Enter();
         public abstract void Exit();
-
-        // Optional virtual method for updating states
-        public virtual void Update()
-        {
-            // Default behavior is empty
-        }
     }
 }
