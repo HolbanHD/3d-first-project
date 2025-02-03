@@ -16,7 +16,7 @@ namespace NPC
         protected NPCStateManager stateManager;
 
         [Header("Movement Settings")]
-        [SerializeField] private bool isMovingNPC = false;  // Flag to determine if NPC will move
+        [SerializeField] private bool isMovingNPC = false;  // Flag to determine if NPC will move or be stationary
 
 
         protected virtual void Awake()

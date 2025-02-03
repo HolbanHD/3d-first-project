@@ -6,22 +6,24 @@ namespace NPC
     public class EnemyNPC : DamagableNPC
     {
         /// <summary>
-        /// Base class for defining npcs that attack 
+        /// Base class for defining enemy npcs
         /// </summary>
-        private AttackingNPCData attackingData; // Store the reference to AttackingNPCData
+        private EnemyNPCData attackingData; // Store the reference to AttackingNPCData
         protected override void Init()
         {
             base.Init();
+            CheckCorrectNPCData();
+        }
 
-            // Check if Data is of type AttackingNPCData and store it in attackingData
-            if (Data is AttackingNPCData data)
+        private void CheckCorrectNPCData()
+        {
+            // Check if Data is of type EnemyNPCData and cache it in EnemyData
+            if (Data is EnemyNPCData data)
             {
-                attackingData = data; // Store the casted data
+                attackingData = data;
+                return;
             }
-            else
-            {
-                Debug.LogError("Data is not of type AttackingNPCData!");
-            }
+            Debug.LogError("Data is not of type EnemyNPCData!");
         }
 
         protected virtual void Attack(IDamagable target)
